@@ -2,6 +2,7 @@
 const {
   Model
 } = require('sequelize');
+const { tableName } = require('sequelize/lib/model');
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define("User", {
     name: {
@@ -31,6 +32,28 @@ module.exports = (sequelize, DataTypes) => {
   User.associate = (models) => {
     User.hasMany(models.Task, { foreignKey: "userId" });
   };
-  
+
+  // Hook para hashear la contraseña antes de crear un usuario
+  User.beforeCreate(async (user) => {
+    if (user.password) {
+      const salt = await bcrypt.genSalt(10);
+      user.password = await bcrypt.hash(user.password, salt);
+    }
+  });
+
+  // Hook para hashear la contraseña antes de actualizar un usuario (si se cambia la contraseña)
+  User.beforeUpdate(async (user) => {
+    if (user.changed('password')) {
+      const salt = await bcrypt.genSalt(10);
+      user.password = await bcrypt.hash(user.password, salt);
+    }
+  });
+
+  // Método para comparar contraseñas (útil para el login)
+  User.prototype.comparePassword = async function (candidatePassword) {
+    return await bcrypt.compare(candidatePassword, this.password);
+  };
+
+
   return User;
 };

@@ -40,5 +40,30 @@ module.exports = (sequelize, DataTypes) => {
     Task.belongsTo(models.User, { foreignKey: "userId" });
   };
 
+
+  // Hook para validar las reglas de transición de estado antes de actualizar
+  Task.beforeUpdate(async (task) => {
+    // Si el estado ha cambiado, aplicar las reglas
+    if (task.changed('status')) {
+      const previousStatus = task.previous('status');
+      const newStatus = task.status;
+
+      // Regla 1: No se puede volver a pendiente desde otro estado
+      if (previousStatus !== 'pendiente' && newStatus === 'pendiente') {
+        throw new Error('No se puede volver a "pendiente" desde otro estado');
+      }
+
+      // Regla 2: Sólo se puede marcar como "en progreso" si está en "pendiente"
+      if (newStatus === 'en progreso' && previousStatus !== 'pendiente') {
+        throw new Error('Solo se puede marcar como "en progreso" si está en "pendiente"');
+      }
+
+      // Regla 3: Sólo se puede marcar como "completada" si está en "en progreso"
+      if (newStatus === 'completada' && previousStatus !== 'en progreso') {
+        throw new Error('Solo se puede marcar como "completada" si está en "en progreso"');
+      }
+    }
+  });
+
   return Task;
 };
