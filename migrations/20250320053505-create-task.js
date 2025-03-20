@@ -15,6 +15,14 @@ module.exports = {
       description: {
         type: Sequelize.STRING
       },
+      status: {
+        type: Sequelize.STRING,
+        allowNull: false, // No permite valores nulos
+        validate: {
+          isIn: [['pendiente', 'en progreso', 'completada']]
+        },
+        defaultValue: 'pendiente'
+      },
       dueDate: {
         type: Sequelize.DATE
       },
