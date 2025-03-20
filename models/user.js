@@ -1,4 +1,5 @@
 'use strict';
+const bcrypt = require('bcryptjs');
 const {
   Model
 } = require('sequelize');
@@ -27,7 +28,10 @@ module.exports = (sequelize, DataTypes) => {
         len: [6, 100] // Mínimo 6 caracteres
       }
     }
-  });
+  },
+    {
+      tableName: 'users'  // Nombre de la tabla usuarios en la base de datos
+    });
 
   User.associate = (models) => {
     User.hasMany(models.Task, { foreignKey: "userId" });

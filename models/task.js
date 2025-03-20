@@ -35,7 +35,11 @@ module.exports = (sequelize, DataTypes) => {
         key: 'id' // Clave primaria en la tabla de usuarios
       }
     }
-  });
+  },
+    {
+      tableName: 'tasks'  // Nombre de la tabla tareas en la base de datos
+    }
+  );
   Task.associate = (models) => {
     Task.belongsTo(models.User, { foreignKey: "userId" });
   };
