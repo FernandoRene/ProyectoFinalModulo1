@@ -23,14 +23,35 @@ app.use(express.json()); // Parsear solicitudes con JSON
 app.use(express.urlencoded({ extended: true })); // Parsear solicitudes con formularios
 app.use(morgan('dev')); // Logging en desarrollo
 
-// Sincronizar los modelos con la base de datos antes de configurar las rutas
-db.sequelize.sync({ force: false })
-  .then(() => {
+// Sincronizar los modelos con la base de datos en un orden específico
+const syncDatabase = async () => {
+  console.log('Modelos disponibles:', Object.keys(db));
+  try {
+    // Primero sincronizar el modelo User
+    if (db.User) {
+      await db.User.sync({ force: false });
+      console.log('Tabla User sincronizada correctamente');
+    } else {
+      console.error('El modelo User no está definido correctamente');
+    }
+    
+    // Luego sincronizar el modelo Task (y cualquier otro modelo dependiente)
+    if (db.Task) {
+      await db.Task.sync({ force: false });
+      console.log('Tabla Task sincronizada correctamente');
+    } else {
+      console.error('El modelo Task no está definido correctamente');
+    }
+    
+    // Finalmente, sincronizar cualquier otro modelo restante
     console.log('Base de datos sincronizada correctamente');
-  })
-  .catch(err => {
+  } catch (err) {
     console.error('Error sincronizando la base de datos:', err);
-  });
+  }
+};
+
+// Ejecutar la sincronización secuencial
+syncDatabase();
 
 app.use('/api', userRoutes);
 app.use('/api', taskRoutes);
