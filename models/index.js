@@ -10,12 +10,16 @@ const config = require(__dirname + '/../config/config.json')[env];
 const db = {};
 
 let sequelize;
+
 if (config.use_env_variable) {
+  // Usar variable de entorno (como DATABASE_URL para producción)
   sequelize = new Sequelize(process.env[config.use_env_variable], config);
 } else {
+  // Usar configuración directa (para desarrollo)
   sequelize = new Sequelize(config.database, config.username, config.password, config);
 }
 
+// Cargar modelos
 fs
   .readdirSync(__dirname)
   .filter(file => {
@@ -31,6 +35,7 @@ fs
     db[model.name] = model;
   });
 
+// Asociar modelos si tienen método associate
 Object.keys(db).forEach(modelName => {
   if (db[modelName].associate) {
     db[modelName].associate(db);
