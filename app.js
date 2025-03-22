@@ -6,9 +6,11 @@ const morgan = require('morgan');
 const cors = require('cors');
 const dotenv = require('dotenv');
 
-
 // Cargar variables de entorno
 dotenv.config();
+
+// Importar los modelos para sincronizar la base de datos
+const db = require('./models');
 
 var userRoutes = require('./routes/user.routes');
 var taskRoutes = require('./routes/task.routes');
@@ -21,27 +23,35 @@ app.use(express.json()); // Parsear solicitudes con JSON
 app.use(express.urlencoded({ extended: true })); // Parsear solicitudes con formularios
 app.use(morgan('dev')); // Logging en desarrollo
 
+// Sincronizar los modelos con la base de datos antes de configurar las rutas
+db.sequelize.sync({ force: false })
+  .then(() => {
+    console.log('Base de datos sincronizada correctamente');
+  })
+  .catch(err => {
+    console.error('Error sincronizando la base de datos:', err);
+  });
+
 app.use('/api', userRoutes);
 app.use('/api', taskRoutes);
 
-
 // Ruta para verificar que el servidor está funcionando
 app.get('/', (req, res) => {
-    res.json({ message: 'API de Gestor de Tareas funcionando' });
+  res.json({ message: 'API de Gestor de Tareas funcionando' });
+});
+
+// Manejo de rutas no encontradas
+app.use((req, res, next) => {
+  res.status(404).json({ message: 'Ruta no encontrada' });
+});
+
+// Manejo global de errores
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({
+    message: 'Error en el servidor',
+    error: process.env.NODE_ENV === 'development' ? err.message : 'Error interno'
   });
-  
-  // Manejo de rutas no encontradas
-  app.use((req, res, next) => {
-    res.status(404).json({ message: 'Ruta no encontrada' });
-  });
-  
-  // Manejo global de errores
-  app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).json({
-      message: 'Error en el servidor',
-      error: process.env.NODE_ENV === 'development' ? err.message : 'Error interno'
-    });
-  });
-  
+});
+
 module.exports = app;
