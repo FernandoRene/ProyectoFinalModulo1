@@ -20,7 +20,19 @@
       "ssl": {
         "require": true,
         "rejectUnauthorized": false
+      },
+      "options": {
+        "family": 6
       }
+    },
+    "pool": {
+      "max": 5,
+      "min": 0,
+      "acquire": 60000,
+      "idle": 10000
+    },
+    "retry": {
+      "max": 5
     }
   }
 }
