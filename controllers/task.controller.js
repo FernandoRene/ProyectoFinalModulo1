@@ -11,7 +11,7 @@ exports.createTask = async (req, res) => {
       title,
       description,
       status: 'pendiente', // Estado por defecto
-      dueDate,
+      dueDate: dueDate || null, // Usar dueDate si existe, de lo contrario null
       userId: req.user.id // El userId viene del middleware de autenticación
     });
 

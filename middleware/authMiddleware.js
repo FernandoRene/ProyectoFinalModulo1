@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const { User } = require('../models');
 
 // Obtener la clave secreta desde variables de entorno
-const SECRET_KEY = process.env.SECRET_KEY || 'tu_clave_secreta';
+const SECRET_KEY = process.env.SECRET_KEY || 'secret-key-task-manager';
 
 /**
  * Middleware para proteger rutas que requieren autenticación

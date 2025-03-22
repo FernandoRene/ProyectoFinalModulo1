@@ -19,15 +19,15 @@ const registerValidations = [
     .notEmpty().withMessage('El nombre es obligatorio')
     .isString().withMessage('El nombre debe ser texto')
     .isLength({ min: 2, max: 100 }).withMessage('El nombre debe tener entre 2 y 100 caracteres'),
-  
+
   body('email')
     .notEmpty().withMessage('El email es obligatorio')
     .isEmail().withMessage('Debe proporcionar un email válido'),
-  
+
   body('password')
     .notEmpty().withMessage('La contraseña es obligatoria')
     .isLength({ min: 6 }).withMessage('La contraseña debe tener al menos 6 caracteres'),
-  
+
   validateResults
 ];
 
@@ -38,10 +38,10 @@ const loginValidations = [
   body('email')
     .notEmpty().withMessage('El email es obligatorio')
     .isEmail().withMessage('Debe proporcionar un email válido'),
-  
+
   body('password')
     .notEmpty().withMessage('La contraseña es obligatoria'),
-  
+
   validateResults
 ];
 
@@ -52,15 +52,24 @@ const createTaskValidations = [
   body('title')
     .notEmpty().withMessage('El título es obligatorio')
     .isString().withMessage('El título debe ser texto'),
-  
+
   body('description')
     .optional()
     .isString().withMessage('La descripción debe ser texto'),
-  
+
   body('dueDate')
     .optional()
-    .isISO8601().withMessage('La fecha límite debe ser una fecha válida'),
-  
+    .custom((value) => {
+      if (value === null) {
+        return true; // Aceptar null como valor válido
+      }
+      if (!value) {
+        return true; // Aceptar undefined y "" como valor válido
+      }
+      return body('dueDate').isISO8601().run({ req: { body: { dueDate: value } } });
+    })
+    .withMessage('La fecha límite debe ser una fecha válida'),
+
   validateResults
 ];
 
@@ -70,23 +79,23 @@ const createTaskValidations = [
 const updateTaskValidations = [
   param('id')
     .isNumeric().withMessage('El ID de la tarea debe ser numérico'),
-  
+
   body('title')
     .optional()
     .isString().withMessage('El título debe ser texto'),
-  
+
   body('description')
     .optional()
     .isString().withMessage('La descripción debe ser texto'),
-  
+
   body('status')
     .optional()
     .isIn(['pendiente', 'en progreso', 'completada']).withMessage('El estado debe ser pendiente, en progreso o completada'),
-  
+
   body('dueDate')
     .optional()
     .isISO8601().withMessage('La fecha límite debe ser una fecha válida'),
-  
+
   validateResults
 ];
 
@@ -96,7 +105,7 @@ const updateTaskValidations = [
 const taskIdValidation = [
   param('id')
     .isNumeric().withMessage('El ID de la tarea debe ser numérico'),
-  
+
   validateResults
 ];
 
@@ -107,11 +116,11 @@ const taskFilterValidations = [
   query('status')
     .optional()
     .isIn(['pendiente', 'en progreso', 'completada']).withMessage('El estado debe ser pendiente, en progreso o completada'),
-  
+
   query('search')
     .optional()
     .isString().withMessage('El término de búsqueda debe ser texto'),
-  
+
   validateResults
 ];
 
