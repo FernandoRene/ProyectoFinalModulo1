@@ -27,12 +27,12 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.DATE,
       allowNull: true // Opcional
     },
-    userId: { // validaciones para el campo userId
+    userId: {
       type: DataTypes.INTEGER,
-      allowNull: false, // No permite valores nulos
+      allowNull: false,
       references: {
-        model: 'User', // Nombre de la tabla de user
-        key: 'id' // Clave primaria en la tabla de usuarios
+        model: 'users', // Cambiado de 'User' a 'users'
+        key: 'id'
       }
     }
   },
