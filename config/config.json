@@ -20,9 +20,6 @@
       "ssl": {
         "require": true,
         "rejectUnauthorized": false
-      },
-      "options": {
-        "family": 6
       }
     },
     "pool": {
